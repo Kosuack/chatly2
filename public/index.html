@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chatly</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <!-- Экран входа / регистрации -->
+  <section id="auth" class="auth hidden">
+    <form id="auth-form" class="card">
+      <h1 id="auth-title">Вход в Chatly</h1>
+      <p class="muted" id="auth-sub">Рады видеть вас снова!</p>
+      <label>Имя пользователя
+        <input name="username" autocomplete="username" required minlength="2" maxlength="32">
+      </label>
+      <label class="reg-only hidden">Отображаемое имя
+        <input name="displayName" maxlength="32">
+      </label>
+      <label>Пароль
+        <input name="password" type="password" autocomplete="current-password" required minlength="6">
+      </label>
+      <div class="error" id="auth-error"></div>
+      <button type="submit" id="auth-submit">Войти</button>
+      <button type="button" class="link" id="auth-toggle">Нет аккаунта? Зарегистрироваться</button>
+    </form>
+  </section>
+
+  <!-- Основное приложение -->
+  <div id="app" class="app hidden">
+    <!-- Панель серверов -->
+    <nav id="guilds" class="guilds"></nav>
+
+    <!-- Боковая панель: каналы / личные сообщения / голос -->
+    <aside class="sidebar">
+      <header id="sidebar-header"></header>
+      <div id="sidebar-body" class="sidebar-body"></div>
+      <div id="voice-panel" class="voice-panel hidden"></div>
+      <div class="userbar">
+        <div class="avatar sm" id="me-avatar"></div>
+        <div class="userbar-text">
+          <strong id="me-name"></strong>
+          <span class="muted" id="me-handle"></span>
+        </div>
+        <button class="icon-btn" id="logout" title="Выйти">⎋</button>
+      </div>
+    </aside>
+
+    <!-- Чат -->
+    <main class="chat">
+      <header class="chat-header">
+        <span class="hash" id="chat-icon"></span>
+        <strong id="chat-title"></strong>
+        <span class="muted" id="chat-topic"></span>
+      </header>
+      <div class="messages" id="messages"></div>
+      <div class="typing" id="typing"></div>
+      <div class="composer-wrap">
+        <div class="reply-bar hidden" id="reply-bar"></div>
+        <div class="pending hidden" id="pending"></div>
+        <form class="composer" id="composer">
+          <button type="button" class="attach-btn" id="attach" title="Прикрепить картинку">+</button>
+          <textarea id="input" rows="1" placeholder="Напишите сообщение…"></textarea>
+        </form>
+        <input type="file" id="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden>
+      </div>
+    </main>
+
+    <!-- Список участников -->
+    <aside class="members hidden" id="members"></aside>
+  </div>
+
+  <div id="modal-root"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
