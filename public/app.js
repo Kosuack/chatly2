@@ -621,9 +621,9 @@ function syncPeers(participants) {
   const wanted = new Set(participants.map((p) => p.userId).filter((id) => id !== S.me.id));
   for (const id of wanted) {
     if (!S.peers.has(id)) {
-      getPeer(id);
       // чтобы не было двух встречных предложений, offer отправляет тот, чей id меньше
-      if (S.me.id < id) makeOffer(id);
+      if (S.me.id < id) startNegotiation(id);
+      else getPeer(id);
     }
   }
   for (const id of [...S.peers.keys()]) {
@@ -643,11 +643,27 @@ function getPeer(id) {
   };
   pc.ontrack = (e) => attachRemote(id, e.streams[0] || new MediaStream([e.track]));
   pc.onconnectionstatechange = () => {
+    console.log('voice peer', id, pc.connectionState);
+    if (pc.connectionState === 'connected') clearTimeout(peer.retry);
     renderVoicePanel();
     if (pc.connectionState === 'failed') toast('Не удалось соединиться с участником голосового канала');
   };
   S.peers.set(id, peer);
   return peer;
+}
+
+// Начинаем соединение. Если за 8 секунд звук не поднялся, пробуем заново.
+function startNegotiation(id) {
+  closePeer(id);
+  getPeer(id);
+  makeOffer(id);
+  const peer = S.peers.get(id);
+  peer.retry = setTimeout(() => {
+    const p = S.peers.get(id);
+    if (p && p.pc.connectionState !== 'connected' && S.voiceChannelId && S.me.id < id) {
+      startNegotiation(id);
+    }
+  }, 8000);
 }
 
 async function makeOffer(id) {
@@ -662,7 +678,12 @@ async function makeOffer(id) {
 
 async function onVoiceSignal({ channelId, from, data }) {
   if (channelId !== S.voiceChannelId || !S.localStream) return;
-  const peer = getPeer(from);
+  let peer = getPeer(from);
+  // пришло новое предложение на старое соединение — начинаем переговоры заново
+  if (data.sdp?.type === 'offer' && peer.pc.remoteDescription) {
+    closePeer(from);
+    peer = getPeer(from);
+  }
   const pc = peer.pc;
   try {
     if (data.sdp) {
@@ -717,6 +738,7 @@ function applyAllVolumes() {
 function closePeer(id) {
   const peer = S.peers.get(id);
   if (!peer) return;
+  clearTimeout(peer.retry);
   peer.pc.close();
   peer.ctx?.close();
   S.peers.delete(id);
