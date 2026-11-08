@@ -27,10 +27,26 @@ const MIME = {
   '.jpg': 'image/jpeg',
   '.gif': 'image/gif',
   '.webp': 'image/webp',
+  '.webm': 'audio/webm',
+  '.ogg': 'audio/ogg',
+  '.m4a': 'audio/mp4',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
   '.ico': 'image/x-icon',
 };
-const IMAGE_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/gif': 'gif', 'image/webp': 'webp' };
-const UPLOAD_RE = /^\/uploads\/([a-f0-9]{32}\.(?:png|jpg|gif|webp))$/;
+// картинки и голосовые сообщения
+const IMAGE_TYPES = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/gif': 'gif',
+  'image/webp': 'webp',
+  'audio/webm': 'webm',
+  'audio/ogg': 'ogg',
+  'audio/mp4': 'm4a',
+  'audio/mpeg': 'mp3',
+  'audio/wav': 'wav',
+};
+const UPLOAD_RE = /^\/uploads\/([a-f0-9]{32}\.(?:png|jpg|gif|webp|webm|ogg|m4a|mp3|wav))$/;
 
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
